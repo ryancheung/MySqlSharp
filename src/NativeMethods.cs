@@ -73,5 +73,14 @@ namespace MySqlSharp
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern void mysql_close(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_options(IntPtr mysql, mysql_option option, void* args);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_get_option(IntPtr mysql, mysql_option option, void* args);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_get_option(IntPtr mysql, mysql_option option, ref void* args);
     }
 }
