@@ -82,5 +82,34 @@ namespace MySqlSharp
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         public static extern int mysql_get_option(IntPtr mysql, mysql_option option, ref void* args);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_errno(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern IntPtr mysql_real_connect(IntPtr mysql,
+            [MarshalAs(UnmanagedType.LPStr)] string host,
+            [MarshalAs(UnmanagedType.LPStr)] string user,
+            [MarshalAs(UnmanagedType.LPStr)] string passwd,
+            [MarshalAs(UnmanagedType.LPStr)] string db, uint port,
+            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, ulong clientflag = 0);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_client_info")]
+        public static extern IntPtr _mysql_get_client_info();
+        public static string mysql_get_client_info()
+        {
+            return Marshal.PtrToStringAnsi(_mysql_get_client_info());
+        }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_server_info")]
+        public static extern IntPtr _mysql_get_server_info(IntPtr mysql);
+        public static string mysql_get_server_info(IntPtr mysql)
+        {
+            return Marshal.PtrToStringAnsi(_mysql_get_server_info(mysql));
+        }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool mysql_autocommit(IntPtr mysql, [MarshalAs(UnmanagedType.U1)] bool auto_mode);
     }
 }

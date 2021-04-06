@@ -8,6 +8,8 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static MySqlSharp.NativeMethods;
 using static MySqlSharp.mysql_option;
+using static MySqlSharp.ErrorClient;
+using static MySqlSharp.ErrorServer;
 
 namespace MySqlSharp.Tests
 {
@@ -99,6 +101,103 @@ namespace MySqlSharp.Tests
             ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, &bResult);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(bVal, bResult);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_real_connect()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var errorCode = mysql_errno(mysqlInit);
+            Assert.AreEqual(0, errorCode);
+            Assert.AreNotEqual(IntPtr.Zero, mysqlInit);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_real_connect_with_wrong_password()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "foo";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var errorCode = mysql_errno(mysqlInit);
+            Assert.AreNotEqual(ER_ACCESS_DENIED_ERROR, errorCode);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_autocommit()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+
+            var ret = mysql_autocommit(mysqlInit, true);
+            Assert.IsFalse(ret);
+
+            ret = mysql_autocommit(mysqlInit, false);
+            Assert.IsFalse(ret);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_get_client_info()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+
+            var clientInfo = mysql_get_client_info();
+            Assert.IsNotNull(clientInfo);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_get_server_info()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+
+            var serverInfo = mysql_get_server_info(mysqlInit);
+            Assert.IsNotNull(serverInfo);
 
             mysql_close(mysqlInit);
         }
