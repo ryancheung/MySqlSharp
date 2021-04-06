@@ -111,5 +111,8 @@ namespace MySqlSharp
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool mysql_autocommit(IntPtr mysql, [MarshalAs(UnmanagedType.U1)] bool auto_mode);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern MYSQL_STMT* mysql_stmt_init(IntPtr mysql);
     }
 }

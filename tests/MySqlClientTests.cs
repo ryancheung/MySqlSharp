@@ -201,5 +201,24 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test__mysql_stmt_init()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            Assert.AreNotEqual(IntPtr.Zero, (IntPtr)stmt);
+
+            mysql_close(mysqlInit);
+        }
     }
 }
