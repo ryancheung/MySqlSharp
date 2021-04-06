@@ -66,7 +66,7 @@ namespace MySqlSharp
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern ulong mysql_get_client_version();
+        public static extern uint mysql_get_client_version();
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern IntPtr mysql_init(IntPtr mysql = default);
@@ -92,7 +92,7 @@ namespace MySqlSharp
             [MarshalAs(UnmanagedType.LPStr)] string user,
             [MarshalAs(UnmanagedType.LPStr)] string passwd,
             [MarshalAs(UnmanagedType.LPStr)] string db, uint port,
-            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, ulong clientflag = 0);
+            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, uint clientflag = 0);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_client_info")]
         public static extern IntPtr _mysql_get_client_info();

@@ -16,8 +16,8 @@ namespace MySqlSharp
         public byte* db;                 /* Database for table */
         public byte* catalog;            /* Catalog for table */
         public byte* def;                /* Default value (set by mysql_list_fields) */
-        public ulong length;             /* Width of column (create length) */
-        public ulong max_length;         /* Max width for selected set */
+        public uint length;             /* Width of column (create length) */
+        public uint max_length;         /* Max width for selected set */
         public uint name_length;
         public uint org_name_length;
         public uint table_length;
