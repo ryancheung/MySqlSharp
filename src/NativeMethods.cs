@@ -3,6 +3,7 @@
 // file 'LICENSE', which is part of this source code package.
 
 using System;
+using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
@@ -176,6 +177,9 @@ namespace MySqlSharp
         public static extern int mysql_next_result(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void mysql_free_result(MYSQL_RES *result);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern MYSQL_FIELD* mysql_fetch_fields(MYSQL_RES* res);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
@@ -183,5 +187,30 @@ namespace MySqlSharp
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern uint* mysql_fetch_lengths(MYSQL_RES* result);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_stmt_fetch(MYSQL_STMT *stmt);
+
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_ping(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_real_escape_string(IntPtr mysql, IntPtr to, [MarshalAs(UnmanagedType.LPStr)] string from, int length);
+        public static int mysql_real_escape_string(IntPtr mysql, ref string from)
+        {
+            if (string.IsNullOrEmpty(from)) return 0;
+
+            var byteCount = Encoding.UTF8.GetByteCount(from);
+            var memAllocSize = byteCount * 2 + 1;
+
+            var mem = Marshal.AllocHGlobal(memAllocSize);
+
+            var ret = mysql_real_escape_string(mysql, mem, from, byteCount);
+            from = Marshal.PtrToStringAnsi(mem);
+            Marshal.FreeHGlobal(mem);
+
+            return ret;
+        }
     }
 }

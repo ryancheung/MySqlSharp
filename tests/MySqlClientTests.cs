@@ -279,5 +279,28 @@ namespace MySqlSharp.Tests
             Assert.AreEqual(1, affectedRows);
             Assert.AreEqual(2, fieldCount);
         }
+
+        [TestMethod]
+        public void Test_mysql_ping()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            Assert.AreEqual(0, mysql_ping(mysqlInit));
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_real_escape_string()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var str = "binary data: \0\r\n";
+
+            var ret = mysql_real_escape_string(mysqlInit, ref str);
+            Assert.AreEqual("binary data: \\0\\r\\n", str);
+
+            mysql_close(mysqlInit);
+        }
     }
 }
