@@ -16,14 +16,18 @@ namespace MySqlSharp.Tests
     [TestClass]
     public unsafe class MySqlClientTests
     {
+        const string TestUser = "root";
+        const string TestPassword = "mysqlroot";
+        const string TestDB = "mysql";
+
         static IntPtr PrepareMySqlConnection()
         {
             var mysqlInit = mysql_init();
 
             string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
+            string user = TestUser;
+            string password = TestPassword;
+            string database = TestDB;
             uint port = 3306;
 
             return mysql_real_connect(mysqlInit, host, user, password, database, port, null);
@@ -124,9 +128,9 @@ namespace MySqlSharp.Tests
             var mysqlInit = mysql_init();
 
             string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
+            string user = TestUser;
+            string password = TestPassword;
+            string database = TestDB;
             uint port = 3306;
 
             mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
@@ -143,9 +147,9 @@ namespace MySqlSharp.Tests
             var mysqlInit = mysql_init();
 
             string host = "127.0.0.1";
-            string user = "fel";
-            string password = "foo";
-            string database = "fel_auth";
+            string user = TestUser;
+            string password = "wrongpassword";
+            string database = TestDB;
             uint port = 3306;
 
             mysql_real_connect(mysqlInit, host, user, password, database, port, null);
