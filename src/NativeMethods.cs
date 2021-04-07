@@ -75,14 +75,70 @@ namespace MySqlSharp
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern void mysql_close(IntPtr mysql);
 
-        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern int mysql_options(IntPtr mysql, mysql_option option, void* args);
+
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern int mysql_get_option(IntPtr mysql, mysql_option option, void* args);
+        private static extern int mysql_options(IntPtr mysql, mysql_option option, void* args);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern int mysql_get_option(IntPtr mysql, mysql_option option, ref void* args);
+        public static extern int mysql_options(IntPtr mysql, mysql_option option, [MarshalAs(UnmanagedType.LPStr)] string args);
+
+        public static int mysql_options(IntPtr mysql, mysql_option option, bool args)
+        {
+            byte val = args ? (byte)1 : (byte)0;
+
+            return mysql_options(mysql, option, &val);
+        }
+
+        public static int mysql_options(IntPtr mysql, mysql_option option, int args)
+        {
+            return mysql_options(mysql, option, &args);
+        }
+
+        public static int mysql_options(IntPtr mysql, mysql_option option, long args)
+        {
+            return mysql_options(mysql, option, &args);
+        }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern int mysql_get_option(IntPtr mysql, mysql_option option, void* args);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern int mysql_get_option(IntPtr mysql, mysql_option option, ref IntPtr args);
+
+        public static int mysql_get_option(IntPtr mysql, mysql_option option, out string args)
+        {
+            IntPtr result = default;
+            var ret = mysql_get_option(mysql, option, ref result);
+            args = Marshal.PtrToStringAnsi(result);
+            return ret;
+        }
+
+        public static int mysql_get_option(IntPtr mysql, mysql_option option, out bool args)
+        {
+            byte temp = 0;
+            var ret = mysql_get_option(mysql, option, &temp);
+            args = temp == 1;
+            return ret;
+        }
+
+        public static int mysql_get_option(IntPtr mysql, mysql_option option, out int args)
+        {
+            int temp = 0;
+            var ret = mysql_get_option(mysql, option, &temp);
+            args = temp;
+            return ret;
+        }
+
+        public static int mysql_get_option(IntPtr mysql, mysql_option option, out long args)
+        {
+            long temp = 0;
+            var ret = mysql_get_option(mysql, option, &temp);
+            args = temp;
+            return ret;
+        }
+
+
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         public static extern int mysql_errno(IntPtr mysql);
@@ -212,5 +268,8 @@ namespace MySqlSharp
 
             return ret;
         }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_set_character_set(IntPtr mysql, [MarshalAs(UnmanagedType.LPStr)] string csname);
     }
 }

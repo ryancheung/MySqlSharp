@@ -56,20 +56,12 @@ namespace MySqlSharp.Tests
             var mysqlInit = mysql_init();
             string charset = "utf8";
 
-            Span<byte> span = stackalloc byte[Encoding.UTF8.GetByteCount(charset) + 1];
-            Encoding.UTF8.GetBytes(charset, span);
+            var ret = mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, charset);
+            Assert.AreEqual(0, ret);
 
-            fixed (byte* inputPtr = span)
-            {
-                var ret = mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, inputPtr);
-                Assert.AreEqual(0, ret);
-
-                void* result = default;
-                ret = mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, ref result);
-                Assert.AreEqual(0, ret);
-
-                Assert.AreEqual(charset, Encoding.UTF8.GetString((byte*)result, Encoding.UTF8.GetByteCount(charset)));
-            }
+            ret = mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
+            Assert.AreEqual(0, ret);
+            Assert.AreEqual(charset, result);
 
             mysql_close(mysqlInit);
         }
@@ -79,11 +71,10 @@ namespace MySqlSharp.Tests
         {
             var mysqlInit = mysql_init();
             int input = 9999;
-            var ret = mysql_options(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, &input);
+            var ret = mysql_options(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, input);
             Assert.AreEqual(0, ret);
 
-            int result = default;
-            ret = mysql_get_option(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, &result);
+            ret = mysql_get_option(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, out int result);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(input, result);
 
@@ -94,12 +85,11 @@ namespace MySqlSharp.Tests
         public void Test_mysql_options_set_get_long()
         {
             var mysqlInit = mysql_init();
-            ulong input = 9999;
-            var ret = mysql_options(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, &input);
+            long input = 9999;
+            var ret = mysql_options(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, input);
             Assert.AreEqual(0, ret);
 
-            ulong result = default;
-            ret = mysql_get_option(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, &result);
+            ret = mysql_get_option(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, out long result);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(input, result);
 
@@ -110,14 +100,18 @@ namespace MySqlSharp.Tests
         public void Test_mysql_options_set_get_bool()
         {
             var mysqlInit = mysql_init();
-            byte bVal = 1;
-            var ret = mysql_options(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, &bVal);
+
+            var ret = mysql_options(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, true);
             Assert.AreEqual(0, ret);
 
-            byte bResult = default;
-            ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, &bResult);
+            ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, out bool result);
             Assert.AreEqual(0, ret);
-            Assert.AreEqual(bVal, bResult);
+            Assert.IsTrue(result);
+
+            ret = mysql_options(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, false);
+            Assert.AreEqual(0, ret);
+            ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, out result);
+            Assert.IsFalse(result);
 
             mysql_close(mysqlInit);
         }
@@ -299,6 +293,34 @@ namespace MySqlSharp.Tests
 
             var ret = mysql_real_escape_string(mysqlInit, ref str);
             Assert.AreEqual("binary data: \\0\\r\\n", str);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_set_character_set_set_invalid_charset()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var charset = "utf8foo";
+
+            var ret = mysql_set_character_set(mysqlInit, charset);
+            Assert.AreEqual((int)CR_CANT_READ_CHARSET, ret);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_set_character_set()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var charset = "utf8";
+
+            var ret = mysql_set_character_set(mysqlInit, charset);
+            Assert.AreEqual(0, ret);
+            mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
+            Assert.IsTrue(result.StartsWith(charset));
 
             mysql_close(mysqlInit);
         }
