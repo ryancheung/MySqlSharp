@@ -232,5 +232,52 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_stmt_execute()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "select help_keyword_id, name from help_keyword where name = '+';";
+            mysql_stmt_prepare(stmt, sql, Encoding.UTF8.GetByteCount(sql));
+
+            var ret = mysql_stmt_execute(stmt);
+            Assert.AreEqual(0, ret);
+
+            var res = mysql_stmt_result_metadata(stmt);
+
+            var fieldCount = mysql_stmt_field_count(stmt);
+            Assert.AreEqual(2, fieldCount);
+
+            if (mysql_more_results(mysqlInit))
+                mysql_next_result(mysqlInit);
+
+            mysql_stmt_store_result(stmt);
+
+            var rowCount = mysql_stmt_num_rows(stmt);
+            Assert.AreEqual(1, rowCount);
+
+            mysql_stmt_close(stmt);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_query()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var sql = "select help_keyword_id, name from help_keyword where name = '+';";
+            var ret = mysql_query(mysqlInit, sql);
+
+            Assert.AreEqual(0, ret);
+
+            var res = mysql_store_result(mysqlInit);
+            var affectedRows = mysql_affected_rows(mysqlInit);
+            var fieldCount = mysql_field_count(mysqlInit);
+            Assert.AreEqual(1, affectedRows);
+            Assert.AreEqual(2, fieldCount);
+        }
     }
 }

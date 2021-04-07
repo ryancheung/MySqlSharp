@@ -112,6 +112,8 @@ namespace MySqlSharp
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool mysql_autocommit(IntPtr mysql, [MarshalAs(UnmanagedType.U1)] bool auto_mode);
 
+
+
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern MYSQL_STMT* mysql_stmt_init(IntPtr mysql);
 
@@ -124,6 +126,62 @@ namespace MySqlSharp
         public static extern bool mysql_stmt_bind_param(MYSQL_STMT* stmt, MYSQL_BIND* bnd);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool mysql_stmt_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bnd);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool mysql_stmt_free_result(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         public static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, int length);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_stmt_execute(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern MYSQL_RES* mysql_stmt_result_metadata(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_stmt_store_result(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern long mysql_stmt_num_rows(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern long mysql_stmt_affected_rows(MYSQL_STMT *stmt);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_stmt_field_count(MYSQL_STMT *stmt);
+
+
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern int mysql_query(IntPtr mysql, [MarshalAs(UnmanagedType.LPStr)] string sql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern long mysql_affected_rows(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_field_count(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern MYSQL_RES* mysql_store_result(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool mysql_more_results(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_next_result(IntPtr mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern MYSQL_FIELD* mysql_fetch_fields(MYSQL_RES* res);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr* mysql_fetch_row(MYSQL_RES* result);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern uint* mysql_fetch_lengths(MYSQL_RES* result);
     }
 }
