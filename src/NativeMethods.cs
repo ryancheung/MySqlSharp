@@ -122,5 +122,8 @@ namespace MySqlSharp
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool mysql_stmt_bind_param(MYSQL_STMT* stmt, MYSQL_BIND* bnd);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
+        public static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, int length);
     }
 }

@@ -213,5 +213,20 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_stmt_prepare()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "SELECT 1";
+            var ret = mysql_stmt_prepare(stmt, sql, Encoding.UTF8.GetByteCount(sql));
+            Assert.AreEqual(0, ret);
+
+            mysql_stmt_close(stmt);
+
+            mysql_close(mysqlInit);
+        }
     }
 }
