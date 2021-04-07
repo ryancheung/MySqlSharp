@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE', which is part of this source code package.
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace MySqlSharp
@@ -16,8 +17,8 @@ namespace MySqlSharp
         public byte* db;                 /* Database for table */
         public byte* catalog;            /* Catalog for table */
         public byte* def;                /* Default value (set by mysql_list_fields) */
-        public uint length;             /* Width of column (create length) */
-        public uint max_length;         /* Max width for selected set */
+        public UIntPtr length;             /* Width of column (create length) */
+        public UIntPtr max_length;         /* Max width for selected set */
         public uint name_length;
         public uint org_name_length;
         public uint table_length;

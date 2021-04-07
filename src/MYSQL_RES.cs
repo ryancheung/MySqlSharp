@@ -14,7 +14,7 @@ namespace MySqlSharp
         public MYSQL_FIELD* fields;
         public MYSQL_DATA* data;
         public MYSQL_ROWS* data_cursor;
-        public uint* lengths; /* column lengths of current row */
+        public UIntPtr* lengths; /* column lengths of current row */
         public IntPtr handle;          /* for unbuffered reads */
         public void* methods;
         public IntPtr* row;         /* If unbuffered read */

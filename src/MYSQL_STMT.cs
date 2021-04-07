@@ -29,9 +29,9 @@ namespace MySqlSharp
         /* copy of mysql->affected_rows after statement execution */
         public ulong affected_rows;
         public ulong insert_id;          /* copy of mysql->insert_id */
-        public uint stmt_id;       /* Id for prepared statement */
-        public uint flags;         /* i.e. type of cursor to open */
-        public uint prefetch_rows; /* number of rows per one COM_FETCH */
+        public UIntPtr stmt_id;       /* Id for prepared statement */
+        public UIntPtr flags;         /* i.e. type of cursor to open */
+        public UIntPtr prefetch_rows; /* number of rows per one COM_FETCH */
         /*
             Copied from mysql->server_status after execute/fetch to know
             server-side cursor status for this statement.

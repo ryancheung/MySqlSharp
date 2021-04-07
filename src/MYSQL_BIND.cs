@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE', which is part of this source code package.
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace MySqlSharp
@@ -9,7 +10,7 @@ namespace MySqlSharp
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct MYSQL_BIND
     {
-        public uint* length; /* output length pointer */
+        public UIntPtr* length; /* output length pointer */
         public bool* is_null;         /* Pointer to null indicator */
         public void* buffer;          /* buffer to get/put data */
         /* set this if you want to track data truncations happened during fetch */
@@ -19,9 +20,9 @@ namespace MySqlSharp
         public void* fetch_result;
         public void* skip_result;
         /* output buffer length, must be set when fetching str/binary */
-        public uint buffer_length;
-        public uint offset;              /* offset position for char/binary fetch */
-        public uint length_value;        /* Used if length is 0 */
+        public UIntPtr buffer_length;
+        public UIntPtr offset;              /* offset position for char/binary fetch */
+        public UIntPtr length_value;        /* Used if length is 0 */
         public uint param_number;         /* For null count and error messages */
         public uint pack_length;          /* Internal length for packed data */
         public enum_field_types buffer_type; /* buffer type */

@@ -10,6 +10,7 @@ using static MySqlSharp.NativeMethods;
 using static MySqlSharp.mysql_option;
 using static MySqlSharp.ErrorClient;
 using static MySqlSharp.ErrorServer;
+using static MySqlSharp.enum_field_types;
 
 namespace MySqlSharp.Tests
 {
@@ -321,6 +322,63 @@ namespace MySqlSharp.Tests
             Assert.AreEqual(0, ret);
             mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
             Assert.IsTrue(result.StartsWith(charset));
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_stmt_bind_param()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "select help_keyword_id, name from help_keyword where name = ?";
+            var retPrep = mysql_stmt_prepare(stmt, sql);
+            Assert.AreEqual(0, retPrep);
+
+            var param1 = "+";
+            MYSQL_BIND param = new();
+
+            var len = (UIntPtr)Encoding.UTF8.GetByteCount(param1);
+            param.buffer_type = MYSQL_TYPE_VAR_STRING;
+
+            void* mem = Marshal.AllocHGlobal((int)len).ToPointer();
+            Marshal.FreeHGlobal((IntPtr)param.buffer);
+            param.buffer = mem;
+            Encoding.UTF8.GetBytes(param1, new Span<byte>(param.buffer, (int)len));
+            param.buffer_length = len;
+
+            param.is_null_value = false;
+
+            mem = Marshal.AllocHGlobal(sizeof(UIntPtr)).ToPointer();
+            Marshal.FreeHGlobal((IntPtr)param.length);
+            MemoryMarshal.Write(new Span<byte>(mem, sizeof(UIntPtr)), ref len);
+            param.length = (UIntPtr*)mem;
+
+            var retBind = mysql_stmt_bind_param(stmt, &param);
+            Assert.IsFalse(retBind);
+
+            var ret = mysql_stmt_execute(stmt);
+            Assert.AreEqual(0, ret);
+
+            // Clear bind param
+            Marshal.FreeHGlobal((IntPtr)param.buffer);
+            Marshal.FreeHGlobal((IntPtr)param.length);
+
+            var res = mysql_stmt_result_metadata(stmt);
+
+            var fieldCount = mysql_stmt_field_count(stmt);
+            Assert.AreEqual(2, fieldCount);
+
+            if (mysql_more_results(mysqlInit))
+                mysql_next_result(mysqlInit);
+
+            mysql_stmt_store_result(stmt);
+
+            var rowCount = mysql_stmt_num_rows(stmt);
+            Assert.AreEqual(1, rowCount);
+
+            mysql_stmt_close(stmt);
 
             mysql_close(mysqlInit);
         }
