@@ -262,11 +262,16 @@ namespace MySqlSharp
 
             var mem = Marshal.AllocHGlobal(memAllocSize);
 
-            var ret = mysql_real_escape_string(mysql, mem, from, byteCount);
-            from = Marshal.PtrToStringAnsi(mem);
-            Marshal.FreeHGlobal(mem);
-
-            return ret;
+            try
+            {
+                var ret = mysql_real_escape_string(mysql, mem, from, byteCount);
+                from = Marshal.PtrToStringAnsi(mem);
+                return ret;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(mem);
+            }
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
