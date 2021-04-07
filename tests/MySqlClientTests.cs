@@ -16,6 +16,19 @@ namespace MySqlSharp.Tests
     [TestClass]
     public unsafe class MySqlClientTests
     {
+        static IntPtr PrepareMySqlConnection()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = "fel";
+            string password = "fel";
+            string database = "fel_auth";
+            uint port = 3306;
+
+            return mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+        }
+
         [TestMethod]
         public void Test_mysql_get_client_version()
         {
@@ -145,15 +158,7 @@ namespace MySqlSharp.Tests
         [TestMethod]
         public void Test_mysql_autocommit()
         {
-            var mysqlInit = mysql_init();
-
-            string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
-            uint port = 3306;
-
-            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var mysqlInit = PrepareMySqlConnection();
 
             var ret = mysql_autocommit(mysqlInit, true);
             Assert.IsFalse(ret);
@@ -167,15 +172,7 @@ namespace MySqlSharp.Tests
         [TestMethod]
         public void Test_mysql_get_client_info()
         {
-            var mysqlInit = mysql_init();
-
-            string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
-            uint port = 3306;
-
-            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var mysqlInit = PrepareMySqlConnection();
 
             var clientInfo = mysql_get_client_info();
             Assert.IsNotNull(clientInfo);
@@ -186,15 +183,7 @@ namespace MySqlSharp.Tests
         [TestMethod]
         public void Test_mysql_get_server_info()
         {
-            var mysqlInit = mysql_init();
-
-            string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
-            uint port = 3306;
-
-            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var mysqlInit = PrepareMySqlConnection();
 
             var serverInfo = mysql_get_server_info(mysqlInit);
             Assert.IsNotNull(serverInfo);
@@ -203,20 +192,24 @@ namespace MySqlSharp.Tests
         }
 
         [TestMethod]
-        public void Test__mysql_stmt_init()
+        public void Test_mysql_stmt_init()
         {
-            var mysqlInit = mysql_init();
-
-            string host = "127.0.0.1";
-            string user = "fel";
-            string password = "fel";
-            string database = "fel_auth";
-            uint port = 3306;
-
-            mysqlInit = mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var mysqlInit = PrepareMySqlConnection();
 
             var stmt = mysql_stmt_init(mysqlInit);
             Assert.AreNotEqual(IntPtr.Zero, (IntPtr)stmt);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_stmt_close()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var ret = mysql_stmt_close(stmt);
+            Assert.IsFalse(ret);
 
             mysql_close(mysqlInit);
         }
