@@ -219,7 +219,7 @@ namespace MySqlSharp.Tests
 
             var stmt = mysql_stmt_init(mysqlInit);
             var sql = "SELECT 1";
-            var ret = mysql_stmt_prepare(stmt, sql, Encoding.UTF8.GetByteCount(sql));
+            var ret = mysql_stmt_prepare(stmt, sql);
             Assert.AreEqual(0, ret);
 
             mysql_stmt_close(stmt);
@@ -234,7 +234,7 @@ namespace MySqlSharp.Tests
 
             var stmt = mysql_stmt_init(mysqlInit);
             var sql = "select help_keyword_id, name from help_keyword where name = '+';";
-            mysql_stmt_prepare(stmt, sql, Encoding.UTF8.GetByteCount(sql));
+            mysql_stmt_prepare(stmt, sql);
 
             var ret = mysql_stmt_execute(stmt);
             Assert.AreEqual(0, ret);

@@ -191,7 +191,12 @@ namespace MySqlSharp
         public static extern bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, int length);
+        private static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, int length);
+
+        public static int mysql_stmt_prepare(MYSQL_STMT *stmt, string query)
+        {
+            return mysql_stmt_prepare(stmt, query, Encoding.UTF8.GetByteCount(query));
+        }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern int mysql_stmt_execute(MYSQL_STMT *stmt);
