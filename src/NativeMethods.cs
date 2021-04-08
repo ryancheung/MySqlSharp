@@ -149,7 +149,7 @@ namespace MySqlSharp
             [MarshalAs(UnmanagedType.LPStr)] string user,
             [MarshalAs(UnmanagedType.LPStr)] string passwd,
             [MarshalAs(UnmanagedType.LPStr)] string db, uint port,
-            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, uint clientflag = 0);
+            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, UIntPtr clientflag = default);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_client_info")]
         public static extern IntPtr _mysql_get_client_info();
@@ -191,11 +191,11 @@ namespace MySqlSharp
         public static extern bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, int length);
+        private static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, UIntPtr length);
 
         public static int mysql_stmt_prepare(MYSQL_STMT *stmt, string query)
         {
-            return mysql_stmt_prepare(stmt, query, Encoding.UTF8.GetByteCount(query));
+            return mysql_stmt_prepare(stmt, query, (UIntPtr)Encoding.UTF8.GetByteCount(query));
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
@@ -247,7 +247,7 @@ namespace MySqlSharp
         public static extern IntPtr* mysql_fetch_row(MYSQL_RES* result);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern uint* mysql_fetch_lengths(MYSQL_RES* result);
+        public static extern UIntPtr* mysql_fetch_lengths(MYSQL_RES* result);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern int mysql_stmt_fetch(MYSQL_STMT *stmt);
@@ -257,7 +257,7 @@ namespace MySqlSharp
         public static extern int mysql_ping(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern int mysql_real_escape_string(IntPtr mysql, IntPtr to, [MarshalAs(UnmanagedType.LPStr)] string from, int length);
+        public static extern UIntPtr mysql_real_escape_string(IntPtr mysql, IntPtr to, [MarshalAs(UnmanagedType.LPStr)] string from, UIntPtr length);
         public static int mysql_real_escape_string(IntPtr mysql, ref string from)
         {
             if (string.IsNullOrEmpty(from)) return 0;
@@ -269,9 +269,9 @@ namespace MySqlSharp
 
             try
             {
-                var ret = mysql_real_escape_string(mysql, mem, from, byteCount);
+                var ret = mysql_real_escape_string(mysql, mem, from, (UIntPtr)byteCount);
                 from = Marshal.PtrToStringAnsi(mem);
-                return ret;
+                return (int)ret;
             }
             finally
             {
