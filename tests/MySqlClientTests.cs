@@ -229,6 +229,22 @@ namespace MySqlSharp.Tests
         }
 
         [TestMethod]
+        public void Test_mysql_stmt_param_count()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "select help_keyword_id, name from help_keyword where name = ?;";
+            mysql_stmt_prepare(stmt, sql);
+
+            Assert.AreEqual(1, mysql_stmt_param_count(stmt));
+
+            mysql_stmt_close(stmt);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
         public void Test_mysql_stmt_execute()
         {
             var mysqlInit = PrepareMySqlConnection();

@@ -218,6 +218,11 @@ namespace MySqlSharp
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern int mysql_stmt_field_count(MYSQL_STMT *stmt);
 
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_param_count")]
+        private static extern UIntPtr _mysql_stmt_param_count(MYSQL_STMT *stmt);
+
+        public static int mysql_stmt_param_count(MYSQL_STMT *stmt) => (int)_mysql_stmt_param_count(stmt);
+
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
