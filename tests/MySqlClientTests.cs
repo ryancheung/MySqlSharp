@@ -382,5 +382,41 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_fetch_row()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var sql = "select help_keyword_id, name from help_keyword where name = '+';";
+            var ret = mysql_query(mysqlInit, sql);
+
+            Assert.AreEqual(0, ret);
+
+            var res = mysql_store_result(mysqlInit);
+            var affectedRows = mysql_affected_rows(mysqlInit);
+            var fieldCount = mysql_field_count(mysqlInit);
+            Assert.AreEqual(2, fieldCount);
+
+            var row = mysql_fetch_row(res);
+            UIntPtr* lengths = mysql_fetch_lengths(res);
+
+            for (int i = 0; i < fieldCount; i++)
+            {
+                IntPtr fieldValuePtr = row[i];
+                var fieldValueLen = (int)lengths[i];
+
+                var fieldValueStr = Marshal.PtrToStringAnsi(fieldValuePtr);
+
+                if (i == 0)
+                    Assert.AreEqual("84", fieldValueStr);
+                if (i == 1)
+                    Assert.AreEqual("+", fieldValueStr);
+            }
+
+            // next row is empty
+            row = mysql_fetch_row(res);
+            Assert.AreEqual((IntPtr)0, (IntPtr)row);
+        }
     }
 }
