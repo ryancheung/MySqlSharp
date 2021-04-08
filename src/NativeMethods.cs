@@ -223,6 +223,40 @@ namespace MySqlSharp
 
         public static int mysql_stmt_param_count(MYSQL_STMT *stmt) => (int)_mysql_stmt_param_count(stmt);
 
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_attr_set")]
+        private static extern bool _mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, void* attr);
+
+        public static bool mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, bool attr)
+        {
+            byte val = attr ? (byte)1 : (byte)0;
+            return _mysql_stmt_attr_set(stmt, attr_type, &val);
+        }
+
+        public static bool mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, int attr)
+        {
+            UIntPtr val = (UIntPtr)attr;
+            return _mysql_stmt_attr_set(stmt, attr_type, &val);
+        }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_attr_get")]
+        private static extern bool _mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, void *attr);
+
+        public static bool mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, out bool attr)
+        {
+            byte temp = 0;
+            var ret = _mysql_stmt_attr_get(stmt, attr_type, &temp);
+            attr = temp == 1;
+            return ret;
+        }
+
+        public static bool mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, out int attr)
+        {
+            UIntPtr temp = default;
+            var ret = _mysql_stmt_attr_get(stmt, attr_type, &temp);
+            attr = (int)temp;
+            return ret;
+        }
+
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]

@@ -11,6 +11,7 @@ using static MySqlSharp.mysql_option;
 using static MySqlSharp.ErrorClient;
 using static MySqlSharp.ErrorServer;
 using static MySqlSharp.enum_field_types;
+using static MySqlSharp.enum_stmt_attr_type;
 
 namespace MySqlSharp.Tests
 {
@@ -238,6 +239,28 @@ namespace MySqlSharp.Tests
             mysql_stmt_prepare(stmt, sql);
 
             Assert.AreEqual(1, mysql_stmt_param_count(stmt));
+
+            mysql_stmt_close(stmt);
+
+            mysql_close(mysqlInit);
+        }
+
+        [TestMethod]
+        public void Test_mysql_stmt_attr_get_set()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "select help_keyword_id, name from help_keyword where name = ?;";
+            mysql_stmt_prepare(stmt, sql);
+
+            mysql_stmt_attr_get(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, out bool attr);
+            Assert.IsFalse(attr);
+
+            mysql_stmt_attr_set(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, true);
+
+            mysql_stmt_attr_get(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, out attr);
+            Assert.IsTrue(attr);
 
             mysql_stmt_close(stmt);
 
