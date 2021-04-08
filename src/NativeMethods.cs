@@ -25,6 +25,8 @@ namespace MySqlSharp
                 MySqlLibrarySuffix = ".dylib";
             else if (OperatingSystem.IsLinux())
                 MySqlLibrarySuffix = ".so";
+            else
+                MySqlLibrarySuffix = ".so";
 
             var appDir = AppContext.BaseDirectory;
 
@@ -110,7 +112,7 @@ namespace MySqlSharp
         {
             IntPtr result = default;
             var ret = mysql_get_option(mysql, option, ref result);
-            args = Marshal.PtrToStringAnsi(result);
+            args = Marshal.PtrToStringAnsi(result) ?? string.Empty;
             return ret;
         }
 
@@ -155,14 +157,14 @@ namespace MySqlSharp
         public static extern IntPtr _mysql_get_client_info();
         public static string mysql_get_client_info()
         {
-            return Marshal.PtrToStringAnsi(_mysql_get_client_info());
+            return Marshal.PtrToStringAnsi(_mysql_get_client_info()) ?? string.Empty;
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_server_info")]
         public static extern IntPtr _mysql_get_server_info(IntPtr mysql);
         public static string mysql_get_server_info(IntPtr mysql)
         {
-            return Marshal.PtrToStringAnsi(_mysql_get_server_info(mysql));
+            return Marshal.PtrToStringAnsi(_mysql_get_server_info(mysql)) ?? string.Empty;
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
@@ -270,7 +272,7 @@ namespace MySqlSharp
             try
             {
                 var ret = mysql_real_escape_string(mysql, mem, from, (UIntPtr)byteCount);
-                from = Marshal.PtrToStringAnsi(mem);
+                from = Marshal.PtrToStringAnsi(mem) ?? string.Empty;
                 return (int)ret;
             }
             finally
