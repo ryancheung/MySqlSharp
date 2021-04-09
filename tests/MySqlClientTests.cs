@@ -457,5 +457,23 @@ namespace MySqlSharp.Tests
             row = mysql_fetch_row(res);
             Assert.AreEqual((IntPtr)0, (IntPtr)row);
         }
+
+        [TestMethod]
+        public void Test_mysql_error()
+        {
+            var mysqlInit = mysql_init();
+
+            string host = "127.0.0.1";
+            string user = TestUser;
+            string password = "wrongpassword";
+            string database = TestDB;
+            uint port = 3306;
+
+            mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+            var error = mysql_error(mysqlInit);
+            Assert.IsTrue(error.Contains("Access denied"));
+
+            mysql_close(mysqlInit);
+        }
     }
 }
