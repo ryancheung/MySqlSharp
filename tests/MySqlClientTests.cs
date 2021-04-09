@@ -492,5 +492,16 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_get_server_version()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var serverVersion = mysql_get_server_version(mysqlInit);
+            Assert.IsTrue(serverVersion > 0);
+
+            mysql_close(mysqlInit);
+        }
     }
 }
