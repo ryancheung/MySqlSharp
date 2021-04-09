@@ -475,5 +475,22 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_stmt_error()
+        {
+            var mysqlInit = PrepareMySqlConnection();
+
+            var stmt = mysql_stmt_init(mysqlInit);
+            var sql = "SELECT a";
+            var ret = mysql_stmt_prepare(stmt, sql);
+            Assert.AreNotEqual(0, ret);
+            var error = mysql_stmt_error(stmt);
+            Assert.AreEqual("Unknown column 'a' in 'field list'", error);
+
+            mysql_stmt_close(stmt);
+
+            mysql_close(mysqlInit);
+        }
     }
 }

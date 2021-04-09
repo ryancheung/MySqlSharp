@@ -325,10 +325,16 @@ namespace MySqlSharp
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_error")]
         private static extern IntPtr _mysql_error(IntPtr mysql);
-
         public static string mysql_error(IntPtr mysql)
         {
             return Marshal.PtrToStringAnsi(_mysql_error(mysql)) ?? string.Empty;
+        }
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_stmt_error")]
+        private static extern IntPtr _mysql_stmt_error(MYSQL_STMT* stmt);
+        public static string mysql_stmt_error(MYSQL_STMT* stmt)
+        {
+            return Marshal.PtrToStringAnsi(_mysql_stmt_error(stmt)) ?? string.Empty;
         }
     }
 }
