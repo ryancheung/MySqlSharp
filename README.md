@@ -1,3 +1,5 @@
+[![Nuget](https://img.shields.io/nuget/v/MySqlSharp)](https://www.nuget.org/packages/MySqlSharp/)
+
 # MySqlSharp
 
 A dotnet 5 wrapper around `libmysqlclient`
