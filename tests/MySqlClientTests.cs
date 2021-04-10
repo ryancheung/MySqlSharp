@@ -503,5 +503,11 @@ namespace MySqlSharp.Tests
 
             mysql_close(mysqlInit);
         }
+
+        [TestMethod]
+        public void Test_mysql_thread_safe()
+        {
+            Assert.IsTrue(mysql_thread_safe());
+        }
     }
 }

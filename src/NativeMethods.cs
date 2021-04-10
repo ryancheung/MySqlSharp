@@ -340,5 +340,9 @@ namespace MySqlSharp
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_get_server_version")]
         private static extern UIntPtr _mysql_get_server_version(IntPtr mysql);
         public static int mysql_get_server_version(IntPtr mysql) => (int)_mysql_get_server_version(mysql);
+
+        [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_thread_safe")]
+        private static extern uint _mysql_thread_safe();
+        public static bool mysql_thread_safe() => _mysql_thread_safe() == 1 ? true : false;
     }
 }
