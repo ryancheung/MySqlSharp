@@ -15,7 +15,7 @@ namespace MySqlSharp
     {
         public ulong row_count;
         public MYSQL_FIELD* fields;
-        public MYSQL_DATA* data;
+        public MYSQL_DATA_OLD* data;
         public MYSQL_ROWS* data_cursor;
         public CULong* lengths; /* column lengths of current row */
         public IntPtr handle;          /* for unbuffered reads */

@@ -22,7 +22,7 @@ namespace MySqlSharp
         public MYSQL_BIND* params_;        /* input parameters */
         public MYSQL_BIND* bind;          /* output parameters */
         public MYSQL_FIELD* fields;       /* result set metadata */
-        public MYSQL_DATA result;         /* cached result set */
+        public MYSQL_DATA_OLD result;         /* cached result set */
         public MYSQL_ROWS* data_cursor;   /* current row in cached result */
         /*
             mysql_stmt_fetch() calls this function to fetch one row (it's different
