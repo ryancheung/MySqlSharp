@@ -56,6 +56,10 @@ namespace MySqlSharp.Tests
         public void Test_mysql_options_set_get_string()
         {
             var mysqlInit = mysql_init();
+
+            mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string defaultValue);
+            Assert.AreEqual("", defaultValue);
+
             string charset = "utf8";
 
             var ret = mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, charset);
@@ -103,17 +107,15 @@ namespace MySqlSharp.Tests
         {
             var mysqlInit = mysql_init();
 
-            var ret = mysql_options(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, true);
+            var ret = mysql_get_option(mysqlInit, MYSQL_OPT_RECONNECT, out bool defaultValue);
+            Assert.IsFalse(defaultValue);
+
+            ret = mysql_options(mysqlInit, MYSQL_OPT_RECONNECT, true);
             Assert.AreEqual(0, ret);
 
-            ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, out bool result);
+            ret = mysql_get_option(mysqlInit, MYSQL_OPT_RECONNECT, out bool result);
             Assert.AreEqual(0, ret);
             Assert.IsTrue(result);
-
-            ret = mysql_options(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, false);
-            Assert.AreEqual(0, ret);
-            ret = mysql_get_option(mysqlInit, MYSQL_ENABLE_CLEARTEXT_PLUGIN, out result);
-            Assert.IsFalse(result);
 
             mysql_close(mysqlInit);
         }
@@ -360,7 +362,7 @@ namespace MySqlSharp.Tests
             var ret = mysql_set_character_set(mysqlInit, charset);
             Assert.AreEqual(0, ret);
             mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
-            Assert.IsTrue(result.StartsWith(charset));
+            Assert.IsTrue(result.StartsWith(charset) || result == "latin1");
 
             mysql_close(mysqlInit);
         }
