@@ -14,7 +14,7 @@ namespace MySqlSharp
     public static unsafe class NativeMethods
     {
         public static readonly List<string> MySqlLibrarySearchPaths = new();
-        public const string MySqlLibraryName = "libmysqlclient";
+        public const string MySqlLibraryName = "MYSQL";
         public static readonly string MySqlLibrarySuffix;
 
         static NativeMethods()
@@ -34,16 +34,28 @@ namespace MySqlSharp
 
             if (OperatingSystem.IsWindows())
             {
+                string ProgramFiles = Environment.Is64BitProcess ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) :
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
                 string arch = Environment.Is64BitProcess ? "win-x64" : "win-x86";
                 MySqlLibrarySearchPaths.Add(Path.Combine(appDir, "runtimes", arch, "native"));
                 MySqlLibrarySearchPaths.Add(Path.Combine(appDir, Environment.Is64BitProcess ? "x64" : "x86"));
+                MySqlLibrarySearchPaths.Add(Path.Combine(ProgramFiles, "MySQL", "MySQL Server 8.0", "lib"));
+                MySqlLibrarySearchPaths.Add(Path.Combine(ProgramFiles, "MySQL", "MySQL Server 5.7", "lib"));
+                MySqlLibrarySearchPaths.Add(Path.Combine(ProgramFiles, "MySQL", "MySQL Server 8.0", "lib", "opt"));
+                MySqlLibrarySearchPaths.Add(Path.Combine(ProgramFiles, "MySQL", "MySQL Server 5.7", "lib", "opt"));
+                MySqlLibrarySearchPaths.Add(Path.Combine(ProgramFiles, "MySQL", "lib"));
+                MySqlLibrarySearchPaths.Add("C:/MySQL/lib/debug");
             }
             else
             {
                 string arch = OperatingSystem.IsMacOS() ? "osx" : "linux-" + (Environment.Is64BitProcess ? "x64" : "x86");
                 MySqlLibrarySearchPaths.Add(Path.Combine(appDir, "runtimes", arch, "native"));
                 MySqlLibrarySearchPaths.Add("/usr/lib");
+                MySqlLibrarySearchPaths.Add("/usr/lib/mysql");
                 MySqlLibrarySearchPaths.Add("/usr/local/lib");
+                MySqlLibrarySearchPaths.Add("/usr/local/lib/mysql");
                 MySqlLibrarySearchPaths.Add("/usr/local/mysql/lib");
             }
 
@@ -52,14 +64,26 @@ namespace MySqlSharp
 
         private static IntPtr ImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
+            if (libraryName != MySqlLibraryName) return default;
+
+            // Correct libraryName dependent on platforms
+            if (OperatingSystem.IsWindows())
+                libraryName = "libmysql";
+            else if (OperatingSystem.IsMacOS())
+                libraryName = "libmysqlclient";
+            else if (OperatingSystem.IsLinux())
+                libraryName = "libmysqlclient";
+            else
+                libraryName = "libmysqlclient";
+
             IntPtr handle;
-            var success = NativeLibrary.TryLoad(MySqlLibraryName, typeof(NativeMethods).Assembly,
+            var success = NativeLibrary.TryLoad(libraryName, typeof(NativeMethods).Assembly,
                 DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories | DllImportSearchPath.UseDllDirectoryForDependencies,
                 out handle);
 
             foreach (var path in MySqlLibrarySearchPaths)
             {
-                success = NativeLibrary.TryLoad(Path.Combine(path, $"{MySqlLibraryName}{MySqlLibrarySuffix}"), out handle);
+                success = NativeLibrary.TryLoad(Path.Combine(path, $"{libraryName}{MySqlLibrarySuffix}"), out handle);
                 if (success)
                     break;
             }
