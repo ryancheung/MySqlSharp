@@ -2,16 +2,22 @@
 
 # MySqlSharp
 
-A dotnet 5 wrapper around `libmysqlclient`
+A dotnet 6 wrapper around the MySQL C library `libmysql.dll`, `libmysqlclient.dylib` or `libmysqlclient.so`
 
 ## Supported MySQL version
 
 MySQL Server 5.7+
 
+## Setup
+
+Install MySQL client library first. MySqlSharp doesn't include any binaries.
+
 ## Usage
 
 MySqlSharp wrapps the C APIs from `libmysqlclient`. All APIs are almost the same as the original C API.  
 See [tests/MySqlClientTests.cs](https://github.com/ryancheung/MySqlSharp/blob/main/tests/MySqlClientTests.cs) for usage examples.
+
+NOTE if you're using MySQL 5.7, you'll have to use the *OLD structs for data marshaling.
 
 ## API Reference
 
