@@ -121,9 +121,13 @@ namespace MySqlSharp
             return mysql_options(mysql, option, &args);
         }
 
-        public static int mysql_options(IntPtr mysql, mysql_option option, long args)
+        private static int mysql_options(IntPtr mysql, mysql_option option, IntPtr args)
         {
             return mysql_options(mysql, option, &args);
+        }
+        public static int mysql_options(IntPtr mysql, mysql_option option, long args)
+        {
+            return mysql_options(mysql, option, (IntPtr)args);
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
@@ -158,9 +162,9 @@ namespace MySqlSharp
 
         public static int mysql_get_option(IntPtr mysql, mysql_option option, out long args)
         {
-            long temp = 0;
+            UIntPtr temp = default;
             var ret = mysql_get_option(mysql, option, &temp);
-            args = temp;
+            args = (long)temp;
             return ret;
         }
 

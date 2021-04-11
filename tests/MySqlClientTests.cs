@@ -87,7 +87,7 @@ namespace MySqlSharp.Tests
         public void Test_mysql_options_set_get_long()
         {
             var mysqlInit = mysql_init();
-            long input = 9999;
+            var input = 20L;
             var ret = mysql_options(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, input);
             Assert.AreEqual(0, ret);
 
