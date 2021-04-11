@@ -7,12 +7,18 @@ using System.Runtime.InteropServices;
 
 namespace MySqlSharp
 {
+    /// <summary>
+    /// MYSQL_DATA struct for MySQL 5.7
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct MYSQL_DATA
+    public unsafe struct MYSQL_DATA_OLD
     {
         public MYSQL_ROWS* data;
-        public void* alloc;
+        public void* embedded_info;
+        public MEM_ROOT alloc;
         public ulong rows;
         public uint fields;
+        /* extra info for embedded library */
+        public void *extension;
     }
 }

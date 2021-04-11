@@ -7,8 +7,11 @@ using System.Runtime.InteropServices;
 
 namespace MySqlSharp
 {
+    /// <summary>
+    /// MYSQL_TIME struct for MySQL 5.7
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct MYSQL_TIME
+    public unsafe struct MYSQL_TIME_OLD
     {
         public uint year;
         public uint month;
@@ -19,7 +22,5 @@ namespace MySqlSharp
         public CULong second_part; /**< microseconds */
         public bool neg;
         public enum_mysql_timestamp_type time_type;
-        /// The time zone displacement, specified in seconds.
-        public int time_zone_displacement;
     }
 }

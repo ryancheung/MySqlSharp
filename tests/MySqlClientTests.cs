@@ -19,7 +19,7 @@ namespace MySqlSharp.Tests
     public unsafe class MySqlClientTests
     {
         const string TestUser = "root";
-        const string TestPassword = "mysqlroot";
+        const string TestPassword = "mysql";
         const string TestDB = "mysql";
 
         static IntPtr PrepareMySqlConnection()
@@ -33,6 +33,11 @@ namespace MySqlSharp.Tests
             uint port = 3306;
 
             return mysql_real_connect(mysqlInit, host, user, password, database, port, null);
+        }
+
+        static bool OldClient()
+        {
+            return mysql_get_client_version() < 80000;
         }
 
         [TestMethod]
@@ -57,15 +62,15 @@ namespace MySqlSharp.Tests
         {
             var mysqlInit = mysql_init();
 
-            mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string defaultValue);
+            mysql_get_option(mysqlInit, (int)MYSQL_SET_CHARSET_NAME, out string defaultValue);
             Assert.AreEqual("", defaultValue);
 
             string charset = "utf8";
 
-            var ret = mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, charset);
+            var ret = mysql_options(mysqlInit, (int)MYSQL_SET_CHARSET_NAME, charset);
             Assert.AreEqual(0, ret);
 
-            ret = mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
+            ret = mysql_get_option(mysqlInit, (int)MYSQL_SET_CHARSET_NAME, out string result);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(charset, result);
 
@@ -77,10 +82,10 @@ namespace MySqlSharp.Tests
         {
             var mysqlInit = mysql_init();
             int input = 9999;
-            var ret = mysql_options(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, input);
+            var ret = mysql_options(mysqlInit, (int)MYSQL_OPT_CONNECT_TIMEOUT, input);
             Assert.AreEqual(0, ret);
 
-            ret = mysql_get_option(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, out int result);
+            ret = mysql_get_option(mysqlInit, (int)MYSQL_OPT_CONNECT_TIMEOUT, out int result);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(input, result);
 
@@ -90,12 +95,14 @@ namespace MySqlSharp.Tests
         [TestMethod]
         public void Test_mysql_options_set_get_long()
         {
+            var option = OldClient() ? (int)mysql_option_old.MYSQL_OPT_MAX_ALLOWED_PACKET : (int)MYSQL_OPT_MAX_ALLOWED_PACKET;
+
             var mysqlInit = mysql_init();
             var input = 20L;
-            var ret = mysql_options(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, input);
+            var ret = mysql_options(mysqlInit, option, input);
             Assert.AreEqual(0, ret);
 
-            ret = mysql_get_option(mysqlInit, MYSQL_OPT_MAX_ALLOWED_PACKET, out long result);
+            ret = mysql_get_option(mysqlInit, option, out long result);
             Assert.AreEqual(0, ret);
             Assert.AreEqual(input, result);
 
@@ -107,13 +114,15 @@ namespace MySqlSharp.Tests
         {
             var mysqlInit = mysql_init();
 
-            var ret = mysql_get_option(mysqlInit, MYSQL_OPT_RECONNECT, out bool defaultValue);
+            var option = OldClient() ? (int)mysql_option_old.MYSQL_OPT_RECONNECT : (int)MYSQL_OPT_RECONNECT;
+
+            var ret = mysql_get_option(mysqlInit, option, out bool defaultValue);
             Assert.IsFalse(defaultValue);
 
-            ret = mysql_options(mysqlInit, MYSQL_OPT_RECONNECT, true);
+            ret = mysql_options(mysqlInit, option, true);
             Assert.AreEqual(0, ret);
 
-            ret = mysql_get_option(mysqlInit, MYSQL_OPT_RECONNECT, out bool result);
+            ret = mysql_get_option(mysqlInit, option, out bool result);
             Assert.AreEqual(0, ret);
             Assert.IsTrue(result);
 
@@ -361,7 +370,7 @@ namespace MySqlSharp.Tests
 
             var ret = mysql_set_character_set(mysqlInit, charset);
             Assert.AreEqual(0, ret);
-            mysql_get_option(mysqlInit, MYSQL_SET_CHARSET_NAME, out string result);
+            mysql_get_option(mysqlInit, (int)MYSQL_SET_CHARSET_NAME, out string result);
             Assert.IsTrue(result.StartsWith(charset) || result == "latin1");
 
             mysql_close(mysqlInit);
@@ -380,21 +389,21 @@ namespace MySqlSharp.Tests
             var param1 = "+";
             MYSQL_BIND param = new();
 
-            var len = (UIntPtr)Encoding.UTF8.GetByteCount(param1);
+            var len = new CULong((nuint)Encoding.UTF8.GetByteCount(param1));
             param.buffer_type = MYSQL_TYPE_VAR_STRING;
 
-            void* mem = Marshal.AllocHGlobal((int)len).ToPointer();
+            void* mem = Marshal.AllocHGlobal((int)len.Value).ToPointer();
             Marshal.FreeHGlobal((IntPtr)param.buffer);
             param.buffer = mem;
-            Encoding.UTF8.GetBytes(param1, new Span<byte>(param.buffer, (int)len));
+            Encoding.UTF8.GetBytes(param1, new Span<byte>(param.buffer, (int)len.Value));
             param.buffer_length = len;
 
             param.is_null_value = false;
 
-            mem = Marshal.AllocHGlobal(sizeof(UIntPtr)).ToPointer();
+            mem = Marshal.AllocHGlobal(sizeof(CULong)).ToPointer();
             Marshal.FreeHGlobal((IntPtr)param.length);
-            MemoryMarshal.Write(new Span<byte>(mem, sizeof(UIntPtr)), ref len);
-            param.length = (UIntPtr*)mem;
+            MemoryMarshal.Write(new Span<byte>(mem, sizeof(CULong)), ref len);
+            param.length = (CULong*)mem;
 
             var retBind = mysql_stmt_bind_param(stmt, &param);
             Assert.IsFalse(retBind);
@@ -440,17 +449,17 @@ namespace MySqlSharp.Tests
             Assert.AreEqual(2, fieldCount);
 
             var row = mysql_fetch_row(res);
-            UIntPtr* lengths = mysql_fetch_lengths(res);
+            var lengths = mysql_fetch_lengths(res);
 
             for (int i = 0; i < fieldCount; i++)
             {
                 IntPtr fieldValuePtr = row[i];
-                var fieldValueLen = (int)lengths[i];
+                var fieldValueLen = lengths[i];
 
                 var fieldValueStr = Marshal.PtrToStringAnsi(fieldValuePtr);
 
                 if (i == 0)
-                    Assert.AreEqual("84", fieldValueStr);
+                    Assert.IsTrue(!string.IsNullOrEmpty(fieldValueStr));
                 if (i == 1)
                     Assert.AreEqual("+", fieldValueStr);
             }

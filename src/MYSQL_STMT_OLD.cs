@@ -7,13 +7,16 @@ using System.Runtime.InteropServices;
 
 namespace MySqlSharp
 {
+    /// <summary>
+    /// MYSQL_RES struct for MySQL 5.7
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct MYSQL_STMT
+    public unsafe struct MYSQL_STMT_OLD
     {
         public const int MYSQL_ERRMSG_SIZE = 512;
         public const int SQLSTATE_LENGTH = 5;
 
-        public void* mem_root; /* root allocations */
+        public MEM_ROOT mem_root; /* root allocations */
         public LIST list;                 /* list to keep track of all stmts */
         public IntPtr mysql;              /* connection handle */
         public MYSQL_BIND* params_;        /* input parameters */

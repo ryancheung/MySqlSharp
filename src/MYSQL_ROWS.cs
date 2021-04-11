@@ -12,6 +12,6 @@ namespace MySqlSharp
     {
         public MYSQL_ROWS* next; /* list of rows */
         public IntPtr* data;
-        public UIntPtr length;
+        public CULong length;
     }
 }

@@ -104,39 +104,39 @@ namespace MySqlSharp
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern int mysql_options(IntPtr mysql, mysql_option option, void* args);
+        private static extern int mysql_options(IntPtr mysql, int option, void* args);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern int mysql_options(IntPtr mysql, mysql_option option, [MarshalAs(UnmanagedType.LPStr)] string args);
+        public static extern int mysql_options(IntPtr mysql, int option, [MarshalAs(UnmanagedType.LPStr)] string args);
 
-        public static int mysql_options(IntPtr mysql, mysql_option option, bool args)
+        public static int mysql_options(IntPtr mysql, int option, bool args)
         {
             byte val = args ? (byte)1 : (byte)0;
 
             return mysql_options(mysql, option, &val);
         }
 
-        public static int mysql_options(IntPtr mysql, mysql_option option, int args)
+        public static int mysql_options(IntPtr mysql, int option, int args)
         {
             return mysql_options(mysql, option, &args);
         }
 
-        private static int mysql_options(IntPtr mysql, mysql_option option, IntPtr args)
+        private static int mysql_options(IntPtr mysql, int option, IntPtr args)
         {
             return mysql_options(mysql, option, &args);
         }
-        public static int mysql_options(IntPtr mysql, mysql_option option, long args)
+        public static int mysql_options(IntPtr mysql, int option, long args)
         {
             return mysql_options(mysql, option, (IntPtr)args);
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern int mysql_get_option(IntPtr mysql, mysql_option option, void* args);
+        private static extern int mysql_get_option(IntPtr mysql, int option, void* args);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern int mysql_get_option(IntPtr mysql, mysql_option option, ref IntPtr args);
+        private static extern int mysql_get_option(IntPtr mysql, int option, ref IntPtr args);
 
-        public static int mysql_get_option(IntPtr mysql, mysql_option option, out string args)
+        public static int mysql_get_option(IntPtr mysql, int option, out string args)
         {
             IntPtr result = default;
             var ret = mysql_get_option(mysql, option, ref result);
@@ -144,7 +144,7 @@ namespace MySqlSharp
             return ret;
         }
 
-        public static int mysql_get_option(IntPtr mysql, mysql_option option, out bool args)
+        public static int mysql_get_option(IntPtr mysql, int option, out bool args)
         {
             byte temp = 0;
             var ret = mysql_get_option(mysql, option, &temp);
@@ -152,7 +152,7 @@ namespace MySqlSharp
             return ret;
         }
 
-        public static int mysql_get_option(IntPtr mysql, mysql_option option, out int args)
+        public static int mysql_get_option(IntPtr mysql, int option, out int args)
         {
             int temp = 0;
             var ret = mysql_get_option(mysql, option, &temp);
@@ -160,11 +160,11 @@ namespace MySqlSharp
             return ret;
         }
 
-        public static int mysql_get_option(IntPtr mysql, mysql_option option, out long args)
+        public static int mysql_get_option(IntPtr mysql, int option, out long args)
         {
-            UIntPtr temp = default;
+            CULong temp = default;
             var ret = mysql_get_option(mysql, option, &temp);
-            args = (long)temp;
+            args = (long)temp.Value;
             return ret;
         }
 
@@ -179,7 +179,7 @@ namespace MySqlSharp
             [MarshalAs(UnmanagedType.LPStr)] string user,
             [MarshalAs(UnmanagedType.LPStr)] string passwd,
             [MarshalAs(UnmanagedType.LPStr)] string db, uint port,
-            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, UIntPtr clientflag = default);
+            [MarshalAs(UnmanagedType.LPStr)] string unix_socket, CULong clientflag = default);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_get_client_info")]
         public static extern IntPtr _mysql_get_client_info();
@@ -202,74 +202,74 @@ namespace MySqlSharp
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern MYSQL_STMT* mysql_stmt_init(IntPtr mysql);
+        public static extern IntPtr mysql_stmt_init(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool mysql_stmt_close(MYSQL_STMT *stmt);
+        public static extern bool mysql_stmt_close(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool mysql_stmt_bind_param(MYSQL_STMT* stmt, MYSQL_BIND* bnd);
+        public static extern bool mysql_stmt_bind_param(IntPtr stmt, MYSQL_BIND* bnd);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool mysql_stmt_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bnd);
+        public static extern bool mysql_stmt_bind_result(IntPtr stmt, MYSQL_BIND *bnd);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool mysql_stmt_free_result(MYSQL_STMT *stmt);
+        public static extern bool mysql_stmt_free_result(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern int mysql_stmt_prepare(MYSQL_STMT *stmt, [MarshalAs(UnmanagedType.LPStr)] string query, UIntPtr length);
+        private static extern int mysql_stmt_prepare(IntPtr stmt, [MarshalAs(UnmanagedType.LPStr)] string query, CULong length);
 
-        public static int mysql_stmt_prepare(MYSQL_STMT *stmt, string query)
+        public static int mysql_stmt_prepare(IntPtr stmt, string query)
         {
-            return mysql_stmt_prepare(stmt, query, (UIntPtr)Encoding.UTF8.GetByteCount(query));
+            return mysql_stmt_prepare(stmt, query, new CULong((nuint)Encoding.UTF8.GetByteCount(query)));
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern int mysql_stmt_execute(MYSQL_STMT *stmt);
+        public static extern int mysql_stmt_execute(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern MYSQL_RES* mysql_stmt_result_metadata(MYSQL_STMT *stmt);
+        public static extern IntPtr mysql_stmt_result_metadata(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern int mysql_stmt_store_result(MYSQL_STMT *stmt);
+        public static extern int mysql_stmt_store_result(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern long mysql_stmt_num_rows(MYSQL_STMT *stmt);
+        public static extern long mysql_stmt_num_rows(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern long mysql_stmt_affected_rows(MYSQL_STMT *stmt);
+        public static extern long mysql_stmt_affected_rows(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern int mysql_stmt_field_count(MYSQL_STMT *stmt);
+        public static extern int mysql_stmt_field_count(IntPtr stmt);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_param_count")]
-        private static extern UIntPtr _mysql_stmt_param_count(MYSQL_STMT *stmt);
+        private static extern CULong _mysql_stmt_param_count(IntPtr stmt);
 
-        public static int mysql_stmt_param_count(MYSQL_STMT *stmt) => (int)_mysql_stmt_param_count(stmt);
+        public static int mysql_stmt_param_count(IntPtr stmt) => (int)_mysql_stmt_param_count(stmt).Value;
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_attr_set")]
-        private static extern bool _mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, void* attr);
+        private static extern bool _mysql_stmt_attr_set(IntPtr stmt, enum_stmt_attr_type attr_type, void* attr);
 
-        public static bool mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, bool attr)
+        public static bool mysql_stmt_attr_set(IntPtr stmt, enum_stmt_attr_type attr_type, bool attr)
         {
             byte val = attr ? (byte)1 : (byte)0;
             return _mysql_stmt_attr_set(stmt, attr_type, &val);
         }
 
-        public static bool mysql_stmt_attr_set(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, int attr)
+        public static bool mysql_stmt_attr_set(IntPtr stmt, enum_stmt_attr_type attr_type, int attr)
         {
-            UIntPtr val = (UIntPtr)attr;
+            var val = new CULong((nuint)attr);
             return _mysql_stmt_attr_set(stmt, attr_type, &val);
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_stmt_attr_get")]
-        private static extern bool _mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, void *attr);
+        private static extern bool _mysql_stmt_attr_get(IntPtr stmt, enum_stmt_attr_type attr_type, void *attr);
 
-        public static bool mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, out bool attr)
+        public static bool mysql_stmt_attr_get(IntPtr stmt, enum_stmt_attr_type attr_type, out bool attr)
         {
             byte temp = 0;
             var ret = _mysql_stmt_attr_get(stmt, attr_type, &temp);
@@ -277,11 +277,11 @@ namespace MySqlSharp
             return ret;
         }
 
-        public static bool mysql_stmt_attr_get(MYSQL_STMT *stmt, enum_stmt_attr_type attr_type, out int attr)
+        public static bool mysql_stmt_attr_get(IntPtr stmt, enum_stmt_attr_type attr_type, out int attr)
         {
-            UIntPtr temp = default;
+            CULong temp = default;
             var ret = _mysql_stmt_attr_get(stmt, attr_type, &temp);
-            attr = (int)temp;
+            attr = (int)temp.Value;
             return ret;
         }
 
@@ -297,7 +297,7 @@ namespace MySqlSharp
         public static extern int mysql_field_count(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern MYSQL_RES* mysql_store_result(IntPtr mysql);
+        public static extern IntPtr mysql_store_result(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -307,26 +307,26 @@ namespace MySqlSharp
         public static extern int mysql_next_result(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern void mysql_free_result(MYSQL_RES *result);
+        public static extern void mysql_free_result(IntPtr result);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern MYSQL_FIELD* mysql_fetch_fields(MYSQL_RES* res);
+        public static extern MYSQL_FIELD* mysql_fetch_fields(IntPtr res);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern IntPtr* mysql_fetch_row(MYSQL_RES* result);
+        public static extern IntPtr* mysql_fetch_row(IntPtr result);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern UIntPtr* mysql_fetch_lengths(MYSQL_RES* result);
+        public static extern CULong* mysql_fetch_lengths(IntPtr result);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern int mysql_stmt_fetch(MYSQL_STMT *stmt);
+        public static extern int mysql_stmt_fetch(IntPtr stmt);
 
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
         public static extern int mysql_ping(IntPtr mysql);
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall)]
-        public static extern UIntPtr mysql_real_escape_string(IntPtr mysql, IntPtr to, [MarshalAs(UnmanagedType.LPStr)] string from, UIntPtr length);
+        public static extern CULong mysql_real_escape_string(IntPtr mysql, IntPtr to, [MarshalAs(UnmanagedType.LPStr)] string from, CULong length);
         public static int mysql_real_escape_string(IntPtr mysql, ref string from)
         {
             if (string.IsNullOrEmpty(from)) return 0;
@@ -338,9 +338,9 @@ namespace MySqlSharp
 
             try
             {
-                var ret = mysql_real_escape_string(mysql, mem, from, (UIntPtr)byteCount);
+                var ret = mysql_real_escape_string(mysql, mem, from, new CULong((nuint)byteCount));
                 from = Marshal.PtrToStringAnsi(mem) ?? string.Empty;
-                return (int)ret;
+                return (int)ret.Value;
             }
             finally
             {
@@ -359,15 +359,15 @@ namespace MySqlSharp
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi, EntryPoint = "mysql_stmt_error")]
-        private static extern IntPtr _mysql_stmt_error(MYSQL_STMT* stmt);
-        public static string mysql_stmt_error(MYSQL_STMT* stmt)
+        private static extern IntPtr _mysql_stmt_error(IntPtr stmt);
+        public static string mysql_stmt_error(IntPtr stmt)
         {
             return Marshal.PtrToStringAnsi(_mysql_stmt_error(stmt)) ?? string.Empty;
         }
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_get_server_version")]
-        private static extern UIntPtr _mysql_get_server_version(IntPtr mysql);
-        public static int mysql_get_server_version(IntPtr mysql) => (int)_mysql_get_server_version(mysql);
+        private static extern CULong _mysql_get_server_version(IntPtr mysql);
+        public static int mysql_get_server_version(IntPtr mysql) => (int)_mysql_get_server_version(mysql).Value;
 
         [DllImport(MySqlLibraryName, CallingConvention = CallingConvention.StdCall, EntryPoint = "mysql_thread_safe")]
         private static extern uint _mysql_thread_safe();
