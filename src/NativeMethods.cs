@@ -57,6 +57,7 @@ namespace MySqlSharp
                 MySqlLibrarySearchPaths.Add("/usr/local/lib");
                 MySqlLibrarySearchPaths.Add("/usr/local/lib/mysql");
                 MySqlLibrarySearchPaths.Add("/usr/local/mysql/lib");
+                MySqlLibrarySearchPaths.Add("/lib/x86_64-linux-gnu");
             }
 
             NativeLibrary.SetDllImportResolver(typeof(NativeMethods).Assembly, ImportResolver);
