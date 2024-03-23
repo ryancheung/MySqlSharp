@@ -335,7 +335,7 @@ namespace MySqlSharp
             var byteCount = Encoding.UTF8.GetByteCount(from);
             var memAllocSize = byteCount * 2 + 1;
 
-            var mem = Marshal.AllocHGlobal(memAllocSize);
+            var mem = (nint)NativeMemory.Alloc((nuint)memAllocSize);
 
             try
             {
@@ -345,7 +345,7 @@ namespace MySqlSharp
             }
             finally
             {
-                Marshal.FreeHGlobal(mem);
+                NativeMemory.Free((void*)mem);
             }
         }
 

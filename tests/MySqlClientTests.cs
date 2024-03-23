@@ -392,17 +392,17 @@ namespace MySqlSharp.Tests
             var len = new CULong((nuint)Encoding.UTF8.GetByteCount(param1));
             param.buffer_type = MYSQL_TYPE_VAR_STRING;
 
-            void* mem = Marshal.AllocHGlobal((int)len.Value).ToPointer();
-            Marshal.FreeHGlobal((IntPtr)param.buffer);
+            void* mem = NativeMemory.Alloc(len.Value);
+            NativeMemory.Free(param.buffer);
             param.buffer = mem;
             Encoding.UTF8.GetBytes(param1, new Span<byte>(param.buffer, (int)len.Value));
             param.buffer_length = len;
 
             param.is_null_value = false;
 
-            mem = Marshal.AllocHGlobal(sizeof(CULong)).ToPointer();
-            Marshal.FreeHGlobal((IntPtr)param.length);
-            MemoryMarshal.Write(new Span<byte>(mem, sizeof(CULong)), ref len);
+            mem = NativeMemory.Alloc((nuint)sizeof(CULong));
+            NativeMemory.Free(param.length);
+            MemoryMarshal.Write(new Span<byte>(mem, sizeof(CULong)), in len);
             param.length = (CULong*)mem;
 
             var retBind = mysql_stmt_bind_param(stmt, &param);
@@ -412,8 +412,8 @@ namespace MySqlSharp.Tests
             Assert.AreEqual(0, ret);
 
             // Clear bind param
-            Marshal.FreeHGlobal((IntPtr)param.buffer);
-            Marshal.FreeHGlobal((IntPtr)param.length);
+            NativeMemory.Free(param.buffer);
+            NativeMemory.Free(param.length);
 
             var res = mysql_stmt_result_metadata(stmt);
 
